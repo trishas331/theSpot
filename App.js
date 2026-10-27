@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-import { SPOTS } from "./data/spots";
+import { supabase } from "./lib/supabase";
 
 // Where the map opens: the Clarendon / Courthouse / Ballston corridor,
 // where the seed data is densest.
@@ -37,6 +37,23 @@ export default function App() {
   const [selected, setSelected] = useState(null); // the spot whose card is open
   const [category, setCategory] = useState("All");
   const [userLoc, setUserLoc] = useState(null); // { latitude, longitude } or null
+  const [spots, setSpots] = useState([]); // loaded from Supabase
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch all spots from the database once, when the app opens.
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase.from("spots").select("*");
+      if (error) {
+        setError(error.message);
+      } else {
+        // The database uses why_viral; the rest of the app uses whyViral.
+        setSpots(data.map((r) => ({ ...r, whyViral: r.why_viral })));
+      }
+      setLoading(false);
+    })();
+  }, []);
 
   // Ask for location permission once, when the app opens.
   useEffect(() => {
@@ -53,13 +70,13 @@ export default function App() {
 
   // Build the filter chips from the data: All, Bakery, Cafe, ...
   const categories = useMemo(
-    () => ["All", ...Array.from(new Set(SPOTS.map((s) => s.category)))],
-    []
+    () => ["All", ...Array.from(new Set(spots.map((s) => s.category)))],
+    [spots]
   );
 
   const visibleSpots = useMemo(
-    () => SPOTS.filter((s) => category === "All" || s.category === category),
-    [category]
+    () => spots.filter((s) => category === "All" || s.category === category),
+    [spots, category]
   );
 
   function pickCategory(cat) {
@@ -128,6 +145,14 @@ export default function App() {
         </ScrollView>
       </View>
 
+      {(loading || error) && (
+        <View style={styles.banner}>
+          <Text style={styles.bannerText}>
+            {loading ? "Loading spots..." : `Couldn't load spots: ${error}`}
+          </Text>
+        </View>
+      )}
+
       {/* Jump to my location */}
       {userLoc && (
         <TouchableOpacity style={styles.locateBtn} onPress={goToMe}>
@@ -177,6 +202,17 @@ const styles = StyleSheet.create({
   chipActive: { backgroundColor: "#111" },
   chipText: { fontSize: 14, fontWeight: "600", color: "#111" },
   chipTextActive: { color: "white" },
+  banner: {
+    position: "absolute",
+    top: Platform.OS === "ios" ? 110 : 90,
+    left: 16,
+    backgroundColor: "white",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    elevation: 3,
+  },
+  bannerText: { fontSize: 13, color: "#111" },
   locateBtn: {
     position: "absolute",
     right: 16,
