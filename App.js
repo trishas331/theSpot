@@ -7,10 +7,11 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, Polyline } from "react-native-maps";
 import * as Location from "expo-location";
 import { supabase } from "./lib/supabase";
 import SubmitSpot from "./SubmitSpot";
+import RouteSearch, { RouteResults } from "./RoutePanel";
 
 // Where the map opens: the Clarendon / Courthouse / Ballston corridor,
 // where the seed data is densest.
@@ -42,6 +43,8 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showSubmit, setShowSubmit] = useState(false);
+  const [showRoute, setShowRoute] = useState(false);
+  const [route, setRoute] = useState(null); // active route, or null
 
   // Fetch all spots from the database once, when the app opens.
   useEffect(() => {
@@ -93,6 +96,19 @@ export default function App() {
     );
   }, [spots]);
 
+  // Zoom to the route when one is set; zoom back out to all spots when cleared.
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const points = route
+      ? route.coordinates
+      : spots.map((s) => ({ latitude: s.lat, longitude: s.lon }));
+    if (points.length === 0) return;
+    mapRef.current.fitToCoordinates(points, {
+      edgePadding: { top: 140, right: 60, bottom: route ? 340 : 220, left: 60 },
+      animated: true,
+    });
+  }, [route]);
+
   function pickCategory(cat) {
     setCategory(cat);
     setSelected(null); // close the card so it can't show a spot that's now hidden
@@ -125,7 +141,10 @@ export default function App() {
         showsUserLocation
         onPress={() => setSelected(null)}
       >
-        {visibleSpots.map((spot) => (
+        {route && (
+          <Polyline coordinates={route.coordinates} strokeWidth={4} strokeColor="#2563eb" />
+        )}
+        {(route ? route.spots : visibleSpots).map((spot) => (
           <Marker
             key={spot.id}
             coordinate={{ latitude: spot.lat, longitude: spot.lon }}
@@ -180,8 +199,37 @@ export default function App() {
       </TouchableOpacity>
       <SubmitSpot visible={showSubmit} onClose={() => setShowSubmit(false)} />
 
+      {/* Route-based discovery */}
+      <TouchableOpacity
+        style={[styles.addBtn, { top: Platform.OS === "ios" ? 204 : 184 }]}
+        onPress={() => setShowRoute(true)}
+      >
+        <Text style={styles.locateText}>Route</Text>
+      </TouchableOpacity>
+      <RouteSearch
+        visible={showRoute}
+        onClose={() => setShowRoute(false)}
+        userLoc={userLoc}
+        spots={spots}
+        onRoute={(r) => {
+          setSelected(null);
+          setRoute(r);
+        }}
+      />
+      {route && (
+        <RouteResults
+          route={route}
+          selected={selected}
+          onSelect={setSelected}
+          onClear={() => {
+            setRoute(null);
+            setSelected(null);
+          }}
+        />
+      )}
+
       {/* Detail card for the tapped spot */}
-      {selected && (
+      {selected && !route && (
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{selected.name}</Text>
           <Text style={styles.cardMeta}>

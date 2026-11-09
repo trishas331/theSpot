@@ -14,9 +14,10 @@ A mobile app (React Native + Expo) that shows trending local spots near you on a
 - Category filter chips (Bakery, Cafe, Restaurant, Bar)
 - "Near me" button that recenters the map on your location
 - "Add a spot" form: user suggestions are stored as pending and reviewed before publishing
+- Route-based discovery: enter a destination, see the driving route and the trending spots within 0.5 mi of it, ranked by distance off the route
 
 ## Tech stack
-React Native, Expo (SDK 58), react-native-maps, expo-location, Supabase (Postgres)
+React Native, Expo (SDK 58), react-native-maps, expo-location, Supabase (Postgres), OSRM (routing)
 
 ## Run it locally
 1. Clone the repo and install packages:
@@ -39,7 +40,7 @@ React Native, Expo (SDK 58), react-native-maps, expo-location, Supabase (Postgre
 - [x] Map screen with category filtering and distance
 - [x] Move spot data from a local file to Supabase
 - [x] Spot submission form (submissions go to a pending table and are reviewed before appearing on the map)
-- [ ] Route-based discovery (spots along a path to a destination)
+- [x] Route-based discovery (spots within 0.5 mi of a driving route to a destination)
 - [x] Verify venue coordinates against OpenStreetMap and Google Maps (see analysis repo)
 - [ ] ML: extract venue names from TikTok captions (spaCy NER, planned)
 
@@ -49,3 +50,4 @@ Hotspot clustering (DBSCAN) and venue geocoding live in a companion repo: `theSp
 ## Data notes
 - Coordinates were verified against OpenStreetMap and Google Maps; see the analysis repo for the method and the `coord_source` column.
 - The "why it's trending" text comes from web research, not verified TikTok data.
+- Routing uses the free public OSRM demo server (driving only, rate-limited), which is fine for a prototype but not for production. Distance to the route is computed in `lib/route.js` by projecting each spot onto the nearest route segment.
