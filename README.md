@@ -1,6 +1,6 @@
 # theSpot
 
-A mobile app (React Native + Expo) that shows trending local spots near you on a map. The first version covers Arlington, VA with 16 hand-curated venues stored in a Supabase (Postgres) database.
+A mobile app (React Native + Expo) that shows trending local spots near you on a map. The first version covers Arlington, VA with 15 hand-curated venues stored in a Supabase (Postgres) database.
 
 <!-- Add screenshots here once you've uploaded them to the screenshots/ folder, for example:
 <p>
@@ -24,7 +24,7 @@ React Native, Expo (SDK 58), react-native-maps, expo-location, Supabase (Postgre
    ```bash
    npm install
    ```
-2. Create a free [Supabase](https://supabase.com) project. In its SQL Editor, run `supabase/setup.sql` to create the `spots` table and load the 16 venues.
+2. Create a free [Supabase](https://supabase.com) project. In its SQL Editor, run `supabase/setup.sql` to create the `spots` table and load the 15 venues.
 3. Create a file named `.env.local` in the project root with your project's URL and publishable key (Project Settings, then API):
    ```
    EXPO_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT-ID.supabase.co
@@ -41,12 +41,12 @@ React Native, Expo (SDK 58), react-native-maps, expo-location, Supabase (Postgre
 - [x] Move spot data from a local file to Supabase
 - [ ] Spot submission form (user-contributed spots)
 - [ ] Route-based discovery (spots along a path to a destination)
-- [ ] Verify venue coordinates against OpenStreetMap (in progress, see analysis repo)
+- [x] Verify venue coordinates against OpenStreetMap and Google Maps (see analysis repo)
 - [ ] ML: extract venue names from TikTok captions (spaCy NER, planned)
 
 ## Data analysis
 Hotspot clustering (DBSCAN) and venue geocoding live in a companion repo: `theSpot-analysis`.
 
 ## Data notes
-- Coordinates are hand-estimated and being verified; treat them as approximate.
+- Coordinates were verified against OpenStreetMap and Google Maps; see the analysis repo for the method and the `coord_source` column.
 - The "why it's trending" text comes from web research, not verified TikTok data.
