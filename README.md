@@ -13,6 +13,7 @@ A mobile app (React Native + Expo) that shows trending local spots near you on a
 - Tap a pin to see why it's trending, its address, and how far away it is
 - Category filter chips (Bakery, Cafe, Restaurant, Bar)
 - "Near me" button that recenters the map on your location
+- "Add a spot" form: user suggestions are stored as pending and reviewed before publishing
 
 ## Tech stack
 React Native, Expo (SDK 58), react-native-maps, expo-location, Supabase (Postgres)
@@ -22,7 +23,7 @@ React Native, Expo (SDK 58), react-native-maps, expo-location, Supabase (Postgre
    ```bash
    npm install
    ```
-2. Create a free [Supabase](https://supabase.com) project. In its SQL Editor, run `supabase/setup.sql` to create the `spots` table and load the 15 venues.
+2. Create a free [Supabase](https://supabase.com) project. In its SQL Editor, run `supabase/setup.sql` to create the `spots` table and load the 15 venues, then run `supabase/submissions.sql` to create the submissions table.
 3. Create a file named `.env.local` in the project root with your project's URL and publishable key (Project Settings, then API):
    ```
    EXPO_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT-ID.supabase.co
@@ -37,7 +38,7 @@ React Native, Expo (SDK 58), react-native-maps, expo-location, Supabase (Postgre
 ## Roadmap
 - [x] Map screen with category filtering and distance
 - [x] Move spot data from a local file to Supabase
-- [ ] Spot submission form (user-contributed spots)
+- [x] Spot submission form (submissions go to a pending table and are reviewed before appearing on the map)
 - [ ] Route-based discovery (spots along a path to a destination)
 - [x] Verify venue coordinates against OpenStreetMap and Google Maps (see analysis repo)
 - [ ] ML: extract venue names from TikTok captions (spaCy NER, planned)

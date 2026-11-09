@@ -10,6 +10,7 @@ import {
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { supabase } from "./lib/supabase";
+import SubmitSpot from "./SubmitSpot";
 
 // Where the map opens: the Clarendon / Courthouse / Ballston corridor,
 // where the seed data is densest.
@@ -40,6 +41,7 @@ export default function App() {
   const [spots, setSpots] = useState([]); // loaded from Supabase
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showSubmit, setShowSubmit] = useState(false);
 
   // Fetch all spots from the database once, when the app opens.
   useEffect(() => {
@@ -172,6 +174,12 @@ export default function App() {
         </TouchableOpacity>
       )}
 
+      {/* Suggest a spot */}
+      <TouchableOpacity style={styles.addBtn} onPress={() => setShowSubmit(true)}>
+        <Text style={styles.locateText}>+ Add a spot</Text>
+      </TouchableOpacity>
+      <SubmitSpot visible={showSubmit} onClose={() => setShowSubmit(false)} />
+
       {/* Detail card for the tapped spot */}
       {selected && (
         <View style={styles.card}>
@@ -240,6 +248,20 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
   },
   locateText: { fontWeight: "600", color: "#111" },
+  addBtn: {
+    position: "absolute",
+    left: 16,
+    top: Platform.OS === "ios" ? 158 : 138,
+    backgroundColor: "white",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
   card: {
     position: "absolute",
     left: 16,
