@@ -79,6 +79,18 @@ export default function App() {
     [spots, category]
   );
 
+  // Once spots load, zoom the map to fit all the pins.
+  useEffect(() => {
+    if (!mapRef.current || spots.length === 0) return;
+    mapRef.current.fitToCoordinates(
+      spots.map((s) => ({ latitude: s.lat, longitude: s.lon })),
+      {
+        edgePadding: { top: 140, right: 60, bottom: 220, left: 60 },
+        animated: false,
+      }
+    );
+  }, [spots]);
+
   function pickCategory(cat) {
     setCategory(cat);
     setSelected(null); // close the card so it can't show a spot that's now hidden

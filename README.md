@@ -2,12 +2,10 @@
 
 A mobile app (React Native + Expo) that shows trending local spots near you on a map. The first version covers Arlington, VA with 15 hand-curated venues stored in a Supabase (Postgres) database.
 
-<!-- Add screenshots here once you've uploaded them to the screenshots/ folder, for example:
 <p>
   <img src="screenshots/map.png" width="250" />
   <img src="screenshots/card.png" width="250" />
 </p>
--->
 
 ## Features
 - Map opens on the Clarendon / Courthouse / Ballston corridor
